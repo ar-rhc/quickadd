@@ -123,11 +123,14 @@ function replaceIllegalFileNameCharactersInString(string) {
 }
 
 async function apiGet(url, data) {
-    let finalURL = new URL(url);
-    if (data)
-        Object.keys(data).forEach(key => finalURL.searchParams.append(key, data[key]));
-
-    finalURL.searchParams.append("apikey", Settings[API_KEY_OPTION]);
+	let finalURL = url.replace(/\/$/, ''); // Remove trailing slash if present
+	finalURL += '?apikey=' + encodeURIComponent(Settings[API_KEY_OPTION]);
+	
+	if (data) {
+		Object.keys(data).forEach(key => {
+			finalURL += '&' + encodeURIComponent(key) + '=' + encodeURIComponent(data[key]);
+		});
+	}
 
     const res = await request({
         url: finalURL.href,
